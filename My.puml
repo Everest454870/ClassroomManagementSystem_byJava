@@ -1,0 +1,154 @@
+@startuml
+
+abstract class roomServiceRemote {
+  +roomReserving(char, int): void
+  +roomCleaning(char): void
+  +roomOccupying(char): void
+  +endOfOccupation(char): void
+  +userNeedsRepair(char, String): void
+  +serverNeedsRepair(char): void
+  +completeRepair(char): void
+  +printState(): String
+  +getState(char): State
+  +getIsStop(): boolean
+  +registerObserver(String, MyObserver): void
+  +get_S_num_of_people(): int
+  +get_C_num_of_people(): int
+  +get_L_num_of_people(): int
+  +get_S_num(): int
+  +get_C_num(): int
+  +get_L_num(): int
+  +getCleanNoReservedtState(): State
+  +getCleanReservedState(): State
+  +getOccupiedState(): State
+  +getToBeCleanState(): State
+  +getToBeRepairState(): State
+  +setIsStop(boolean): void
+  +get_S_situation(): String
+  +get_C_situation(): String
+  +get_L_situation(): String
+}
+
+class roomService extends UnicastRemoteObject implements roomServiceRemote, Subject {
+  +State clean_not_reserved
+  +State clean_reserved
+  +State occupied
+  +State to_be_repair
+  +State to_be_clean
+  +State S_state
+  +State C_state
+  +State L_state
+  +static int S_num = 20
+  +static int C_num = 75
+  +static int L_num = 150
+  +String location
+  +int S_num_of_people
+  +int C_num_of_people
+  +int L_num_of_people
+  +String S_situation
+  +String C_situation
+  +String L_situatuin
+  +boolean isStop
+  +HashMap<String, MyObserver> observers
+}
+
+interface MyDisplay {
+  +display(): void
+}
+
+interface MyObserver {
+  +checkState(): void
+}
+
+interface State extends Serializable {
+  +roomReserving(char, int): void
+  +roomCleaning(char): void
+  +roomOccupying(char): void
+  +endOfOccupation(char): void
+  +userNeedsRepair(char): void
+  +serverNeedsRepair(char): void
+  +completeRepair(char): void
+}
+
+interface Subject {
+  +registerObserver(String, MyObserver): void
+  +removeObserver(String): void
+  +notifyObservers(): void
+}
+
+class ApproverDisplay implements MyObserver, MyDisplay, Serializable {
+  +State S_state_now
+  +State C_state_now
+  +State L_state_now
+  +roomServiceRemote roomservice
+}
+
+class CleanNotReservedState implements State {
+  +transient roomService room
+}
+
+class CleanReservedState implements State {
+  +transient roomService room
+}
+
+class MatainerDisplay implements MyObserver, MyDisplay, Serializable {
+  +State S_state_now
+  +State C_state_now
+  +State L_state_now
+  +roomServiceRemote roomservice
+}
+
+class OccupiedState implements State {
+  +transient roomService room
+}
+
+class StaffDisplay implements MyObserver, MyDisplay, Serializable {
+  +State S_state_now
+  +State C_state_now
+  +State L_state_now
+  +roomServiceRemote roomservice
+}
+
+class ToBeCleanState implements State {
+  +transient roomService room
+}
+
+class ToBeRepairState implements State {
+  +transient roomService room
+}
+
+class UserDisplay implements MyObserver, MyDisplay, Serializable {
+  +State S_state_now
+  +State C_state_now
+  +State L_state_now
+  +roomServiceRemote roomservice
+}
+
+roomServiceRemote <.. roomService : implements
+roomService <.. Subject : implements
+roomService <.. UnicastRemoteObject : extends
+MyDisplay <.. ApproverDisplay : implemented by
+MyObserver <.. ApproverDisplay : implemented by
+Serializable <.. ApproverDisplay : implemented by
+State <.. CleanNotReservedState : implemented by
+State <.. CleanReservedState : implemented by
+State <.. OccupiedState : implemented by
+State <.. ToBeCleanState : implemented by
+State <.. ToBeRepairState : implemented by
+MyObserver <.. MatainerDisplay : implemented by
+MyDisplay <.. MatainerDisplay : implemented by
+Serializable <.. MatainerDisplay : implemented by
+MyObserver <.. StaffDisplay : implemented by
+MyDisplay <.. StaffDisplay : implemented by
+Serializable <.. StaffDisplay : implemented by
+MyObserver <.. UserDisplay : implemented by
+MyDisplay <.. UserDisplay : implemented by
+Serializable <.. UserDisplay : implemented by
+
+roomService "1" *-- "many" State : contains
+ApproverDisplay -- roomServiceRemote : has
+MatainerDisplay -- roomServiceRemote : has
+StaffDisplay -- roomServiceRemote : has
+UserDisplay -- roomServiceRemote : has
+
+@enduml
